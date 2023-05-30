@@ -29,11 +29,11 @@ public class StudySetController {
 
     @PostMapping
     public ResponseEntity<StudySet> createStudySet(@RequestBody Map<String, String> payload) {
-        return new ResponseEntity<StudySet>(studySetService.createStudySet(payload.get("userName"), payload.get("title")), HttpStatus.CREATED);
+        return new ResponseEntity<StudySet>(studySetService.createStudySet(payload.get("username"), payload.get("title")), HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<StudySet> updateStudySet(@RequestBody Map<String, String> payload) {
-        return new ResponseEntity<StudySet>(studySetService.createStudySet(payload.get("userName"), payload.get("title")), HttpStatus.CREATED);
+        return new ResponseEntity<StudySet>(studySetService.createStudySet(payload.get("username"), payload.get("title")), HttpStatus.CREATED);
     }
 }
