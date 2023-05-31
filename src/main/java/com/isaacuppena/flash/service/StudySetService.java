@@ -28,11 +28,11 @@ public class StudySetService {
         return studySetRepository.findStudySetBySetId(setId);
     }
 
-    public StudySet createStudySet(String userName, String title) {
+    public StudySet createStudySet(String username, String title) {
         StudySet studySet = studySetRepository.insert(new StudySet(title));
 
         mongoTemplate.update(User.class)
-                .matching(Criteria.where("userName").is(userName))
+                .matching(Criteria.where("username").is(username))
                 .apply(new Update().push("studySetIds").value(studySet))
                 .first();
 

@@ -1,11 +1,14 @@
 package com.isaacuppena.flash.config;
 
 import com.isaacuppena.flash.service.MongoUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,27 +18,25 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private final MongoUserDetailsService mongoUserDetailsService;
 
-    public SecurityConfig(MongoUserDetailsService mongoUserDetailsService) {
-        this.mongoUserDetailsService = mongoUserDetailsService;
-    }
+    @Autowired
+    private MongoUserDetailsService mongoUserDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/login")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated()
+                        .requestMatchers("/login", "/register").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/logout")
                         .logoutSuccessUrl("/api/login")
                         .deleteCookies("JSESSIONID")
                         .invalidateHttpSession(true))
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/login"))
+                .csrf()
+                    .disable()
+                .cors().and()
                 .userDetailsService(mongoUserDetailsService)
                 .build();
     }
@@ -47,6 +48,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class).build();
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .build();
     }
 }
