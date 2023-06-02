@@ -1,5 +1,6 @@
 package com.isaacuppena.flash.service;
 
+import com.isaacuppena.flash.model.Flashcard;
 import com.isaacuppena.flash.model.StudySet;
 import com.isaacuppena.flash.model.User;
 import com.isaacuppena.flash.repository.StudySetRepository;
@@ -18,6 +19,9 @@ public class StudySetService {
     private StudySetRepository studySetRepository;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private MongoTemplate mongoTemplate;
 
     public List<StudySet> allStudySets() {
@@ -28,11 +32,12 @@ public class StudySetService {
         return studySetRepository.findStudySetBySetId(setId);
     }
 
-    public StudySet createStudySet(String username, String title) {
-        StudySet studySet = studySetRepository.insert(new StudySet(title));
+    public StudySet createStudySet(String title, User user, List<Flashcard> flashcards) {
+
+        StudySet studySet = studySetRepository.insert(new StudySet(title, user, flashcards));
 
         mongoTemplate.update(User.class)
-                .matching(Criteria.where("username").is(username))
+                .matching(Criteria.where("username").is(user.getUsername()))
                 .apply(new Update().push("studySetIds").value(studySet))
                 .first();
 

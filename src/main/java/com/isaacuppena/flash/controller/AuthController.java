@@ -1,7 +1,10 @@
 package com.isaacuppena.flash.controller;
 
+import com.isaacuppena.flash.dto.UserDTO;
+import com.isaacuppena.flash.model.SecurityUser;
 import com.isaacuppena.flash.model.User;
 import com.isaacuppena.flash.repository.UserRepository;
+import com.isaacuppena.flash.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Security;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,28 +29,21 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<User> login(@RequestBody UserDTO user) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        payload.get("username"),
-                        payload.get("password")
+                        user.getUsername(),
+                        user.getPassword()
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        Optional<User> user = userRepository.findUserByUsername(payload.get("username"));
+        SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
 
-        if (user.isPresent()) {
-            return new ResponseEntity<>(user.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-
-//        HttpHeaders responseHeaders = new HttpHeaders();
-//        responseHeaders.set("Access-Control-Allow-Origin", "*");
+        return new ResponseEntity<>(securityUser.getUser(), HttpStatus.OK);
     }
 
     @PostMapping("/logout")

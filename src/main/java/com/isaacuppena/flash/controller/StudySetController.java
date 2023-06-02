@@ -1,10 +1,13 @@
 package com.isaacuppena.flash.controller;
 
+import com.isaacuppena.flash.dto.StudySetDTO;
+import com.isaacuppena.flash.model.SecurityUser;
 import com.isaacuppena.flash.model.StudySet;
 import com.isaacuppena.flash.service.StudySetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,12 +31,12 @@ public class StudySetController {
     }
 
     @PostMapping
-    public ResponseEntity<StudySet> createStudySet(@RequestBody Map<String, String> payload) {
-        return new ResponseEntity<StudySet>(studySetService.createStudySet(payload.get("username"), payload.get("title")), HttpStatus.CREATED);
+    public ResponseEntity<StudySet> createStudySet(@AuthenticationPrincipal SecurityUser user, @RequestBody StudySetDTO studySet) {
+        return new ResponseEntity<StudySet>(studySetService.createStudySet(studySet.getTitle(), user.getUser(), studySet.getFlashcards()), HttpStatus.CREATED);
     }
 
-    @PutMapping
-    public ResponseEntity<StudySet> updateStudySet(@RequestBody Map<String, String> payload) {
-        return new ResponseEntity<StudySet>(studySetService.createStudySet(payload.get("username"), payload.get("title")), HttpStatus.CREATED);
-    }
+//    @PutMapping
+//    public ResponseEntity<StudySet> updateStudySet(@AuthenticationPrincipal SecurityUser user, @RequestBody StudySetDTO studySet) {
+//        return new ResponseEntity<StudySet>(studySetService.createStudySet(payload.get("username"), payload.get("title")), HttpStatus.CREATED);
+//    }
 }
