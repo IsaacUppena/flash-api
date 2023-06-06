@@ -16,6 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/studySets")
+@CrossOrigin(origins = "http://localhost:3000")
 public class StudySetController {
     @Autowired
     private StudySetService studySetService;
